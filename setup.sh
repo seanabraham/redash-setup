@@ -2,7 +2,7 @@
 # This script setups dockerized Redash on Ubuntu 18.04.
 set -eu
 
-REDASH_BASE_PATH=/opt/redash
+REDASH_BASE_PATH=~/projects/oss/redash/app
 
 install_docker(){
     # Install Docker
@@ -25,7 +25,7 @@ install_docker(){
 create_directories() {
     if [[ ! -e $REDASH_BASE_PATH ]]; then
         sudo mkdir -p $REDASH_BASE_PATH
-        sudo chown $USER:$USER $REDASH_BASE_PATH
+        sudo chown $USER $REDASH_BASE_PATH
     fi
 
     if [[ ! -e $REDASH_BASE_PATH/postgres-data ]]; then
@@ -42,6 +42,9 @@ create_config() {
     COOKIE_SECRET=$(pwgen -1s 32)
     SECRET_KEY=$(pwgen -1s 32)
     POSTGRES_PASSWORD=$(pwgen -1s 32)
+    # COOKIE_SECRET="cookie-secret123"
+    # SECRET_KEY="secret-key123"
+    # POSTGRES_PASSWORD="postgres-password123"
     REDASH_DATABASE_URL="postgresql://postgres:${POSTGRES_PASSWORD}@postgres/postgres"
 
     echo "PYTHONUNBUFFERED=0" >> $REDASH_BASE_PATH/env
@@ -69,7 +72,7 @@ setup_compose() {
     sudo docker-compose up -d
 }
 
-install_docker
+# install_docker
 create_directories
 create_config
-setup_compose
+# setup_compose

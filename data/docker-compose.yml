@@ -4,42 +4,50 @@ x-redash-service: &redash-service
   depends_on:
     - postgres
     - redis
-  env_file: /opt/redash/env
+  env_file: ~/projects/oss/redash/app/env
   restart: always
 services:
   server:
     <<: *redash-service
     command: server
     ports:
-      - "5000:5000"
+      - "5050:5000"
     environment:
       REDASH_WEB_WORKERS: 4
+    volumes:
+      - ~/projects/oss/redash/data:/data
   scheduler:
     <<: *redash-service
     command: scheduler
     environment:
       QUEUES: "celery"
       WORKERS_COUNT: 1
+    volumes:
+      - ~/projects/oss/redash/data:/data
   scheduled_worker:
     <<: *redash-service
     command: worker
     environment:
       QUEUES: "scheduled_queries,schemas"
       WORKERS_COUNT: 1
+    volumes:
+      - ~/projects/oss/redash/data:/data
   adhoc_worker:
     <<: *redash-service
     command: worker
     environment:
       QUEUES: "queries"
       WORKERS_COUNT: 2
+    volumes:
+      - ~/projects/oss/redash/data:/data
   redis:
     image: redis:5.0-alpine
     restart: always
   postgres:
     image: postgres:9.6-alpine
-    env_file: /opt/redash/env
+    env_file: ~/projects/oss/redash/app/env
     volumes:
-      - /opt/redash/postgres-data:/var/lib/postgresql/data
+      - ~/projects/oss/redash/app/postgres-data:/var/lib/postgresql/data
     restart: always
   nginx:
     image: redash/nginx:latest
